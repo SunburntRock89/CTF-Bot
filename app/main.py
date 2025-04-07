@@ -225,18 +225,37 @@ async def top10(ctx, arg=None):
             output+=f"{x['place']}\t| {x['points']:.3f}\t| {x['event']}\n"
     await ctx.message.channel.send(f"```{output}```")
 
-@bot.event
-async def on_message(message):
-    # Check if the message is from the specific user and contains the tenor link
-    if (message.author.id == 1170410289682972804 and 
-        "https://tenor.com/view/dog-enforcement-agency-dea-dog-meme-meme-solana-gif-5592669163470726458" in message.content):
-        try:
-            await message.delete()
-            print(f"Deleted message from user {message.author} containing the specific tenor link")
-        except Exception as e:
-            print(f"Error deleting message: {e}")
-    
-    # Process commands (this is needed when using on_message)
+    # Check if message is from the specific user
+    if message.author.id == 1170410289682972804:
+        # Check for the gif in different formats
+        gif_indicators = [
+            "5592669163470726458",  # GIF ID
+            "dog-enforcement-agency",
+            "dea-dog-meme",
+            "tenor.com"
+        ]
+        
+        content_lower = message.content.lower()
+        
+        # Check if any of the indicators are in the message
+        if any(indicator.lower() in content_lower for indicator in gif_indicators):
+            try:
+                await message.delete()
+                print(f"Deleted suspicious message from user {message.author}")
+            except Exception as e:
+                print(f"Error deleting message: {e}")
+                
+        # Check message embeds
+        for embed in message.embeds:
+            if any(indicator.lower() in str(embed.to_dict()).lower() for indicator in gif_indicators):
+                try:
+                    await message.delete()
+                    print(f"Deleted message with suspicious embed from user {message.author}")
+                except Exception as e:
+                    print(f"Error deleting message: {e}")
+                break
+
+    # Process commands
     await bot.process_commands(message)
 
 bot.run(TOKEN)
