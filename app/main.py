@@ -225,4 +225,18 @@ async def top10(ctx, arg=None):
             output+=f"{x['place']}\t| {x['points']:.3f}\t| {x['event']}\n"
     await ctx.message.channel.send(f"```{output}```")
 
+@bot.event
+async def on_message(message):
+    # Check if the message is from the specific user and contains the tenor link
+    if (message.author.id == 1170410289682972804 and 
+        "https://tenor.com/view/dog-enforcement-agency-dea-dog-meme-meme-solana-gif-5592669163470726458" in message.content):
+        try:
+            await message.delete()
+            print(f"Deleted message from user {message.author} containing the specific tenor link")
+        except Exception as e:
+            print(f"Error deleting message: {e}")
+    
+    # Process commands (this is needed when using on_message)
+    await bot.process_commands(message)
+
 bot.run(TOKEN)
